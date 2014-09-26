@@ -35,6 +35,20 @@
             {
                 border-top: 1px solid #ccc;
             }
+
+           
+
+            .mm-panel{
+                width: 100px;    
+            }
+            .mm-list{
+                font-size: 20px;
+            }
+            
+
+
+
+
         </style>
 
 <script type="text/javascript">
@@ -63,6 +77,22 @@
             }
         });
     });
+
+  $(document).ready(function() {
+            $("#menu").mmenu({
+               "classes": "mm-slide mm-light",
+               "footer": {
+                  "add": true
+               },
+               "header": true,
+               "searchfield": {
+                  "addTo": "panels",
+                  "add": true,
+                  "search": true
+               }
+            });
+         });
+
     </script>
 
 
@@ -166,6 +196,8 @@
                              </p>
                           </div>
                        </div>
+                      
+
                        <div class="col-sm-6 col-md-3">
                           <div class="thumbnail">
                              <img src="../static/test.png" 
@@ -217,15 +249,20 @@
 
 
 
-        <nav id="menu">
-            <ul>
-                <li><a href="#intro">Intro</a></li>
-                <li><a href="#first">First section</a></li>
-                <li><a href="#second">Secons section</a></li>
-                <li><a href="#third">主题图片展示</a></li>
-                 
-            </ul>
-        </nav>
+        <!-- The menu -->
+      <nav id="menu">
+         <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About us</a>
+               <ul>
+                  <li><a href="/about/history">History</a></li>
+                  <li><a href="/about/team">The team</a></li>
+                  <li><a href="/about/address">Our address</a></li>
+               </ul>
+            </li>
+            <li><a href="/contact">Contact</a></li>
+         </ul>
+      </nav>
 
 
 <!-- －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－  －－－－ -->

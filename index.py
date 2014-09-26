@@ -1,5 +1,6 @@
 from flask import Flask
 import pymongo
+import MySQLdb
 import bson.binary
 from flask import render_template
 import flask
@@ -9,6 +10,10 @@ from flask import Flask, request, redirect, url_for
 from werkzeug import secure_filename
 from flask import send_from_directory
 from time import time
+from sqlalchemy import *
+import sqlalchemy.util as util
+import string, sys
+from sqlalchemy.databases import mysql
 
 
 
@@ -18,16 +23,30 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-db = pymongo.MongoClient('localhost', 27017).test
-image_path=db.image 
+
+mysql_engine = create_engine('mysql://root:@localhost:3306/test',encoding = "utf-8",echo =True)   
+#mysql_engine.connect()    
+metadata = MetaData()
+
+
+# conn = MySQLdb.connect(host='localhost', user='lixia',passwd='') 
+# conn.select_db('test');
+# cursor = conn.cursor()
+# cursor.execute("select * from test")
+# data = cursor.fetchone() 
+# print cursor.description
+
+
+# db = pymongo.MongoClient('localhost', 27017).test
+# image_path=db.image 
 
 def save_image_path_to_db(content): 
-    c = dict(content=content) 
+   # c = dict(content=content) 
     
-    image_path.save(c) 
+    # image_path.save(c) 
     # return c['_id'] 
-    return c
-
+    # return c
+    pass
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -39,7 +58,8 @@ def index():
 
 @app.route("/test/")
 def test():
-    x=image_path.find()
+    #x=image_path.find()
+    x=[]
     all_path=[]
     for item in x:
             all_path.append("../"+item['content'].encode('utf8'))
