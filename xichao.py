@@ -1,9 +1,8 @@
-from flask import Flask
-
 from flask import render_template
 import flask
 from cStringIO import StringIO
 import os
+import MySQLdb
 from flask import Flask, request, redirect, url_for
 from werkzeug import secure_filename
 from flask import send_from_directory
@@ -23,20 +22,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 
-#mysql_engine.connect()    
+
+conn = MySQLdb.connect(host='localhost', user='root',passwd='root') 
+conn.select_db('xichao_theme');
+cursor = conn.cursor()
+cursor.execute("select * from xichao_theme")
+data = cursor.fetchone() 
+#print cursor.description
 
 
-
-# conn = MySQLdb.connect(host='localhost', user='lixia',passwd='') 
-# conn.select_db('test');
-# cursor = conn.cursor()
-# cursor.execute("select * from test")
-# data = cursor.fetchone() 
-# print cursor.description
-
-
-# db = pymongo.MongoClient('localhost', 27017).test
-# image_path=db.image 
 
 def save_image_path_to_db(content): 
    # c = dict(content=content) 
@@ -45,6 +39,7 @@ def save_image_path_to_db(content):
     # return c['_id'] 
     # return c
     pass
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -53,6 +48,12 @@ def allowed_file(filename):
 @app.route("/")
 def index():
     return render_template('index.html')
+
+@app.route("/db")
+def testmysql():
+    return "hello db"
+    #return cursor.description
+
 
 @app.route("/test/")
 def test():
