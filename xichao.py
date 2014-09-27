@@ -1,7 +1,5 @@
 from flask import Flask
-import pymongo
-import MySQLdb
-import bson.binary
+
 from flask import render_template
 import flask
 from cStringIO import StringIO
@@ -24,9 +22,9 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-mysql_engine = create_engine('mysql://root:@localhost:3306/test',encoding = "utf-8",echo =True)   
+
 #mysql_engine.connect()    
-metadata = MetaData()
+
 
 
 # conn = MySQLdb.connect(host='localhost', user='lixia',passwd='') 
