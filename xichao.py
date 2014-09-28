@@ -7,10 +7,10 @@ from flask import Flask, request, redirect, url_for
 from werkzeug import secure_filename
 from flask import send_from_directory
 from time import time
-from sqlalchemy import *
-import sqlalchemy.util as util
+#from sqlalchemy import *
+#import sqlalchemy.util as util
 import string, sys
-from sqlalchemy.databases import mysql
+#from sqlalchemy.databases import mysql
 
 
 
@@ -24,11 +24,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 conn = MySQLdb.connect(host='localhost', user='root',passwd='root') 
-conn.select_db('xichao_theme');
+conn.select_db('xichao_wechat');
 cursor = conn.cursor()
 cursor.execute("select * from xichao_theme")
 data = cursor.fetchone() 
-#print cursor.description
+desctext= cursor.description
 
 
 
@@ -49,10 +49,9 @@ def allowed_file(filename):
 def index():
     return render_template('index.html')
 
-@app.route("/db")
+@app.route("/testmysql/")
 def testmysql():
-    return "hello db"
-    #return cursor.description
+    return str(desctext)
 
 
 @app.route("/test/")
