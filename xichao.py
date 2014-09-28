@@ -7,11 +7,12 @@ from flask import Flask, request, redirect, url_for
 from werkzeug import secure_filename
 from flask import send_from_directory
 from time import time
+from flask_wtf.file import FileField
 #from sqlalchemy import *
 #import sqlalchemy.util as util
 import string, sys
 #from sqlalchemy.databases import mysql
-
+ 
 
 
 app = Flask(__name__)
@@ -19,26 +20,16 @@ UPLOAD_FOLDER = 'static/upload_images/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 
 
 
-conn = MySQLdb.connect(host='localhost', user='root',passwd='root') 
-conn.select_db('xichao_wechat');
-cursor = conn.cursor()
-cursor.execute("select * from xichao_theme")
-data = cursor.fetchone() 
-desctext= cursor.description
 
 
 
-def save_image_path_to_db(content): 
-   # c = dict(content=content) 
+
     
-    # image_path.save(c) 
-    # return c['_id'] 
-    # return c
-    pass
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -56,40 +47,72 @@ def testmysql():
 
 @app.route("/test/")
 def test():
-    #x=image_path.find()
-    x=[]
+    conn = MySQLdb.connect(host='localhost', user='root',passwd='') 
+    conn.select_db('xichao_wechat');
+    cursor = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+    x=cursor.execute("select image_path,description from xichao_theme order by tid DESC limit 100")
+    x=cursor.fetchall()
+    
     all_path=[]
+    all_desc=[]
     for item in x:
-            all_path.append("../"+item['content'].encode('utf8'))
-    all_path=str(all_path).replace("\'","").strip("\'")[1:-1]
+        all_path.append("../"+item['image_path'].encode('utf8'))
+        all_desc.append(item['description'])
+    
     print all_path
-    return render_template('nav.html',all_path=all_path)
+    print all_desc
+
+    all_path=str(all_path).replace("\'","").strip("\'")[1:-1]
+   
+    print all_path
+   
+    return render_template('nav.html',all_path=all_path,all_desc=all_desc)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
+    conn = MySQLdb.connect(host='localhost', user='root',passwd='') 
+    conn.select_db('xichao_wechat');
+    cursor = conn.cursor()
+    cursor.execute("select * from xichao_theme order by tid DESC limit 1")
+    data=cursor.fetchone()[0]
+    maxtid=0
+    if data:
+       maxtid=data
+    print type(maxtid)
+    desctext= cursor.description
+
+
+
     if request.method == 'POST':
-        file = request.files['file']
+        file = request.files['image']
+        title=request.form['title']
+        text=request.form['text']
+        description=request.form['description']
         if file and allowed_file(file.filename):
             file.filename=str(int(time()))+'.'+file.filename.rsplit('.', 1)[1]
             
-            #save image url to db
-            content=UPLOAD_FOLDER+file.filename
-            print save_image_path_to_db(content)
+            #save data  to db
+            image_url=UPLOAD_FOLDER+file.filename
+            data=(
+                int(maxtid+1),
+                image_url,
+                title,
+                description,
+                text
+                )
+            print data
+            sql = "insert into xichao_theme(tid,image_path,description,title,text) values (%s, %s, %s, %s,%s)"
+            cursor.execute(sql,data)
+            conn.commit()
+            cursor.close() 
+            conn.close() 
 
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    '''
+            return '<script type="text/javascript" >alert("uploaded!");</script>'
+
+    return render_template("upload.html",maxtid=maxtid)
 @app.route('/upload_images/<filename>')
 def uploaded_file(filename):
     #return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
